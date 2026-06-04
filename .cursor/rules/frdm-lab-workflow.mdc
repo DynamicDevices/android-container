@@ -29,4 +29,6 @@ Full embedded workflow (CI guardrails, intake, evidence): `~/.cursor/skills/embe
 
 Foundries CI → fetch target → flash (SW1 0,1) → serial via ser2net (SW1 1,0, user power-cycles) → iterate.
 
+**SW1 / mode:** Until HW automation (Michael/Ollie), agent infers programming vs run mode (USB phase, serial) and **asks you to set SW1 + power-cycle** when wrong for the next step.
+
 Default target unless stated: ask user or use latest from their message.
