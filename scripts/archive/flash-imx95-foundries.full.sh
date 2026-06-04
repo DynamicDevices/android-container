@@ -492,6 +492,23 @@ UUU
     fi
 }
 
+# Fastboot-only: production imx-boot to eMMC boot hwpart — does NOT re-flash WIC/rootfs.
+write_bootloader_only_uuu() {
+    local uuu_file="$1"
+    cat >"${uuu_file}" <<UUU
+uuu_version 1.4.149
+
+FB: ucmd setenv fastboot_dev mmc
+FB: ucmd setenv emmc_dev 0
+FB: ucmd setenv mmcdev 0
+FB: ucmd mmc dev 0
+FB: flash bootloader ${PROD_BOOT_NAME}
+FB: ucmd if env exists emmc_ack; then ; else setenv emmc_ack 0; fi;
+FB: ucmd mmc partconf 0 \${emmc_ack} 1 0
+FB: done
+UUU
+}
+
 write_sdpv_resume_full_uuu() {
     # Use only in FIT workflow (SPL-only mfgtool + u-boot-mfgtool.itb).
     # Board is at 0151 (SPL started). Write u-boot-mfgtool.itb (FIT) via SDPV to load full U-Boot.
@@ -710,6 +727,9 @@ write_uuu_script_set() {
     validate_full_image_uuu "${FLASH_DIR}/full_image${suffix}.uuu" "${WIC_FB_NAME}"
     write_sdps_only_uuu "${FLASH_DIR}/sdps-only.uuu" "${sdps_file}"
     write_fb_only_uuu "${FLASH_DIR}/fb-only${suffix}.uuu"
+    if [[ -z "${suffix}" ]]; then
+        write_bootloader_only_uuu "${FLASH_DIR}/bootloader-only.uuu"
+    fi
     write_sdpv_resume_full_uuu "${FLASH_DIR}/sdpv-resume-full${suffix}.uuu"
     write_full_image_nxp_boot_uuu "${FLASH_DIR}/${nxp_boot}"
     validate_nxp_boot_uuu "${FLASH_DIR}/${nxp_boot}" "${WIC_FB_NAME}"

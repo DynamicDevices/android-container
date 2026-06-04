@@ -4,6 +4,7 @@
 #   ./scripts/flash-imx95-uuu-only.sh check 2735
 #   ./scripts/flash-imx95-uuu-only.sh prep 2735
 #   ./scripts/flash-imx95-uuu-only.sh run 2735              # uncompressed .wic (default on imx95)
+#   ./scripts/flash-imx95-uuu-only.sh run-bootloader 2745   # imx-boot only (keep WIC/rootfs)
 #   ./scripts/flash-imx95-uuu-only.sh run 2735 --wic-compressed   # .wic.gz (breaks GPT on FRDM)
 #
 # imx95: uuu/fastboot does NOT gunzip. Use full_image-nxp-boot-wic-uncompressed.uuu (see docs/lmp-frdm-workflow.md).
@@ -22,6 +23,7 @@ WIC_MODE="${WIC_MODE:-uncompressed}"
 UUU_SCRIPT_COMPRESSED="full_image-nxp-boot.uuu"
 UUU_SCRIPT_UNCOMPRESSED="full_image-nxp-boot-wic-uncompressed.uuu"
 UUU_SCRIPT="${UUU_SCRIPT_UNCOMPRESSED}"
+UUU_BOOTLOADER_ONLY="bootloader-only.uuu"
 NXP_FLASH_ALL="imx-boot-imx95-15x15-lpddr4x-frdm-sd.bin-flash_all"
 PROD_BOOT="imx-boot-imx95-frdm-evk"
 WIC_GZ="lmp-factory-image-imx95-frdm-evk.wic.gz"
@@ -117,11 +119,30 @@ check_bundle_quiet() {
     check_bundle "$1" >/dev/null
 }
 
-cmd_run() {
+check_bootloader_bundle() {
     local target="$1"
-    local dir uuu_bin log_file
-    check_bundle_quiet "${target}"
+    local dir prod uuu
+    dir="$(bundle_dir "${target}")"
+    [[ -d "${dir}" ]] || die "Missing ${dir}. Run: $(basename "$0") prep ${target}"
+    prod="${dir}/${PROD_BOOT}"
+    uuu="${dir}/${UUU_BOOTLOADER_ONLY}"
+    [[ -s "${prod}" ]] || die "Missing ${prod}. Run: $(basename "$0") prep ${target}"
+    [[ -f "${uuu}" ]] || die "Missing ${uuu}. Re-run: $(basename "$0") prep ${target}"
+    log "Bootloader-only bundle OK: ${dir}"
+    log "  ${UUU_BOOTLOADER_ONLY} → ${PROD_BOOT} ($(stat -c%s "${prod}") bytes)"
+    sed 's/^/  /' "${uuu}"
+    printf '\n'
+    log "Manual (SW1 0,1 Serial Download, board at fastboot 0152 or full_image first):"
+    printf '  cd %s && sudo -n uuu -pp 100 %s\n' "${dir}" "${UUU_BOOTLOADER_ONLY}"
+}
 
+check_bootloader_bundle_quiet() {
+    check_bootloader_bundle "$1" >/dev/null
+}
+
+run_uuu_script() {
+    local target="$1" script_name="$2"
+    local dir uuu_bin log_file
     dir="$(bundle_dir "${target}")"
     uuu_bin="$(command -v uuu 2>/dev/null || true)"
     [[ -n "${uuu_bin}" ]] || die "uuu not on PATH (apt install uuu)"
@@ -131,13 +152,13 @@ cmd_run() {
         sudo -n systemctl stop ser2net || warn "Could not stop ser2net — close port 2000 / ttyACM0"
     fi
 
-    log "Flashing target ${target} — only: uuu -pp 100 ${UUU_SCRIPT}"
-    log "Board: SW1 (0,1) Serial Download, USB J3. Timeout 1800s."
+    log "Flashing target ${target} — uuu -pp 100 ${script_name}"
+    log "Board: SW1 (0,1) Serial Download or fastboot, USB J3. Timeout 1800s."
     mkdir -p "${ROOT_DIR}/logs"
     log_file="${ROOT_DIR}/logs/uuu-flash-${target}-$(date +%Y%m%d-%H%M%S).log"
     log "Logging to ${log_file}"
     set +e
-    (cd "${dir}" && timeout 1800 sudo -n "${uuu_bin}" -pp 100 "${UUU_SCRIPT}" 2>&1 | tee "${log_file}")
+    (cd "${dir}" && timeout 1800 sudo -n "${uuu_bin}" -pp 100 "${script_name}" 2>&1 | tee "${log_file}")
     local rc=${PIPESTATUS[0]}
     set -e
     tail -5 "${log_file}" | sed 's/^/  /'
@@ -156,17 +177,30 @@ cmd_run() {
     return 0
 }
 
+cmd_run() {
+    local target="$1"
+    check_bundle_quiet "${target}"
+    run_uuu_script "${target}" "${UUU_SCRIPT}"
+}
+
+cmd_run_bootloader() {
+    local target="$1"
+    check_bootloader_bundle_quiet "${target}"
+    run_uuu_script "${target}" "${UUU_BOOTLOADER_ONLY}"
+}
+
 main() {
     apply_wic_mode
     local cmd="${1:-}"
     shift || true
     case "${cmd}" in
-        check|run)
+        check|run|run-bootloader)
             set -- $(parse_wic_flags "$@")
             local target="${1:-2735}"
             case "${cmd}" in
                 check) check_bundle "${target}" ;;
                 run)   cmd_run "${target}" ;;
+                run-bootloader) cmd_run_bootloader "${target}" ;;
             esac
             ;;
         prep)
