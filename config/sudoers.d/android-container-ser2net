@@ -1,0 +1,18 @@
+# Optional: passwordless ser2net control for lab serial-over-TCP (user ajlennon).
+# Install:
+#   sudo cp config/sudoers.d/android-container-ser2net /etc/sudoers.d/android-container-ser2net
+#   sudo chmod 0440 /etc/sudoers.d/android-container-ser2net
+#   sudo visudo -cf /etc/sudoers.d/android-container-ser2net
+#
+# Prefer GUI askpass (sudo -A) if you want a password prompt instead of NOPASSWD.
+
+Cmnd_Alias ANDROID_CONTAINER_SER2NET = \
+    /usr/sbin/ser2net, /usr/bin/ser2net, \
+    /bin/systemctl restart ser2net, /bin/systemctl start ser2net, /bin/systemctl stop ser2net, \
+    /bin/systemctl reload ser2net, /bin/systemctl status ser2net, \
+    /usr/bin/systemctl restart ser2net, /usr/bin/systemctl start ser2net, \
+    /usr/bin/systemctl stop ser2net, /usr/bin/systemctl reload ser2net, \
+    /usr/bin/systemctl status ser2net, \
+    /usr/bin/killall ser2net
+
+ajlennon ALL=(root) NOPASSWD: ANDROID_CONTAINER_SER2NET

@@ -1,0 +1,30 @@
+# Paste into dynamic-devices factory ci-scripts/factory-config.yml
+# when Foundries support confirms imx95-frdm-evk is whitelisted.
+#
+# Factory: dynamic-devices
+# Branch:  main-imx95-frdm-devel
+# Machine: imx95-frdm-evk  (parent: imx95-15x15-lpddr4x-frdm, LPDDR4x FRDM only)
+
+# --- tagging: (under lmp: or top-level tagging per your file layout) ---
+refs/heads/main-imx95-frdm-devel:
+  - tag: main-imx95-frdm-devel
+
+# --- lmp.ref_options: ---
+refs/heads/main-imx95-frdm-devel:
+  machines:
+    - imx95-frdm-evk
+  params:
+    DISTRO: lmp-dynamicdevices
+    DEV_MODE: 1
+    IMAGE: lmp-base-console-image
+  mfg_tools:
+    - machine: imx95-frdm-evk
+      params:
+        DISTRO: lmp-mfgtool
+        MFGTOOL_FLASH_IMAGE: lmp-factory-image
+        EXTRA_ARTIFACTS: mfgtool-files.tar.gz
+        IMAGE: mfgtool-files
+
+# --- containers.tagging: (add when you need Compose apps on this branch) ---
+# refs/heads/main-imx95-frdm-devel:
+#   - tag: main-imx95-frdm-devel

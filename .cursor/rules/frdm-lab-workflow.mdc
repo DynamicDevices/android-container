@@ -1,0 +1,32 @@
+---
+description: FRDM-IMX95 LmP lab — user runs hardware; agent reads logs and edits BSP/docs
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+# FRDM-IMX95 Foundries lab
+
+## User runs (do not spawn shell subagents for these)
+
+- `./scripts/flash-imx95-uuu-only.sh prep|check|run`
+- `./scripts/capture-frdm-serial.sh`
+- `uuu`, `systemctl`, `/dev/ttyACM*`, `nc localhost 2000`
+- `fioctl` downloads
+
+## Agent does
+
+- Read `logs/frdm-serial-*.log`, `docs/lmp-frdm-workflow.md`, `docs/imx95-foundries-emmc.md`
+- **SSH to the board** (`fio`/`fio`, sudo `fio`) to validate on real hardware — see `embedded-engineer` skill lab section
+- **Serial via ser2net** (`nc localhost 2000` @ 115200) — prefer over `/dev/ttyACM*` in agent shells
+- Advise BSP / `meta-dynamicdevices-bsp` / factory-integration changes; **confirm before manifest pin / CI trigger**
+- Edit repo files without requiring sandbox `all` unless user explicitly asks
+- **Ask** whether to monitor CI/flash and iterate on failure vs stop and report
+
+Full embedded workflow (CI guardrails, intake, evidence): `~/.cursor/skills/embedded-engineer/SKILL.md`
+
+## Boot loop
+
+Foundries CI → fetch target → flash (SW1 0,1) → serial via ser2net (SW1 1,0, user power-cycles) → iterate.
+
+Default target unless stated: ask user or use latest from their message.

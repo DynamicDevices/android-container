@@ -1,0 +1,21 @@
+# Build and download artifacts
+downloads/
+build/
+tmp-lmp*/
+logs/
+
+# Large images and archives
+*.wic
+*.wic.gz
+*.wic.bz2
+*.imx
+*.tar.gz
+*.tgz
+
+# Android / Cuttlefish trees (fetch separately)
+cuttlefish/
+
+# Editor / local
+.vscode/*.log
+*.swp
+.DS_Store

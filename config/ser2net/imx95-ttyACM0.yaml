@@ -1,0 +1,14 @@
+# FRDM-IMX95 EVK — USB CDC serial (J3), U-Boot / early console @ 115200.
+# Install: sudo cp config/ser2net/imx95-ttyACM0.yaml /etc/ser2net.d/ (see main /etc/ser2net.yaml include)
+# Baud: 115200 8N1 on ttyACM0 for U-Boot after eMMC boot (matches console in your serial log).
+# SPL / uuu phase uses 921600 — stop ser2net before uuu (flash-imx95-uuu-only.sh run does this).
+# Close minicom before connecting (one client per ttyACM0). ser2net kickolduser drops the previous TCP client.
+# Raw TCP (same as minicom over the wire):  nc localhost 2000
+
+connection: &imx95_ttyACM0
+    accepter: tcp,0.0.0.0,2000
+    enable: on
+    timeout: 0
+    options:
+      kickolduser: true
+    connector: serialdev,/dev/ttyACM0,115200n81,local

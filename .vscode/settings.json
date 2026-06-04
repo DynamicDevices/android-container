@@ -1,0 +1,35 @@
+{
+    "git.ignoreLimitWarning": true,
+    "window.title": "${dirty}${activeEditorShort}${separator}imx95-frdm${separator}${appName}",
+    "terminal.integrated.env.linux": {
+        "SUDO_ASKPASS": "${workspaceFolder}/scripts/sudo-askpass-gui.sh",
+        "SSH_ASKPASS": "${workspaceFolder}/scripts/sudo-askpass-gui.sh",
+        "SUDO_ASKPASS_TITLE": "Cursor: sudo password required"
+    },
+    "files.watcherExclude": {
+        "**/downloads/**": true,
+        "**/build/**": true,
+        "**/tmp-lmp*/**": true,
+        "**/.git/objects/**": true,
+        "**/*.wic": true,
+        "**/*.wic.gz": true,
+        "**/*.wic.bz2": true,
+        "**/*.imx": true,
+        "**/*.tar.gz": true,
+        "**/*.tgz": true
+    },
+    "files.exclude": {
+        "**/downloads/extracted-android-*/**": true
+    },
+    "search.exclude": {
+        "**/downloads": true,
+        "**/build": true,
+        "**/tmp-lmp*": true,
+        "**/*.wic": true,
+        "**/*.wic.gz": true,
+        "**/*.wic.bz2": true,
+        "**/*.imx": true,
+        "**/*.tar.gz": true,
+        "**/*.tgz": true
+    }
+}

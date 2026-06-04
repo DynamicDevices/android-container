@@ -1,0 +1,16 @@
+# DEPRECATED entry path for kas-container: configs under android-container/ mount the
+# android-container git repo at /repo, so meta-dynamicdevices layers and includes break.
+#
+# Use from a meta-dynamicdevices checkout (sibling of android-container and meta-dynamicdevices-bsp):
+#
+#   cd ../meta-dynamicdevices
+#   kas-container --ssh-agent --ssh-dir ${HOME}/.ssh \
+#     --runtime-args "-v ${HOME}/yocto:/var/cache" \
+#     build kas/imx95-frdm-evk-mfgtool.yml
+#
+# Canonical kas file: meta-dynamicdevices/kas/imx95-frdm-evk-mfgtool.yml (same branch as BSP).
+
+header:
+  version: 14
+  includes:
+    - ../../meta-dynamicdevices/kas/imx95-frdm-evk-mfgtool.yml

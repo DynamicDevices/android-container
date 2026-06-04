@@ -1,0 +1,20 @@
+# Make ModemManager fully ignore NXP i.MX serial-download devices (vendor 1fc9).
+#
+# Why: during uuu flashing (SDPS 015d / SDPV 0151 / fastboot 0152) ModemManager
+# probes the CDC-ACM/HID interface and resets the device, causing uuu to fail with
+# HID(W): LIBUSB_ERROR_IO / LIBUSB_ERROR_NO_DEVICE at the SDPS stage.
+#
+# ID_MM_DEVICE_IGNORE is the supported way to tell ModemManager to skip a device
+# (more reliable than the older COLOR_MEASUREMENT_DEVICE / MTP_NO_PROBE hacks).
+# With this rule installed you no longer need to stop ModemManager before flashing.
+#
+# Install:
+#   sudo cp config/udev/99-nxp-mm-ignore.rules /etc/udev/rules.d/
+#   sudo udevadm control --reload-rules
+#   (re-plug the board)
+#
+# Covers both the USB device node and any tty/serial interface MM might bind.
+
+SUBSYSTEM=="usb", ATTR{idVendor}=="1fc9", ENV{ID_MM_DEVICE_IGNORE}="1"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1fc9", ENV{ID_MM_DEVICE_IGNORE}="1"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1fc9", ENV{ID_MM_PORT_IGNORE}="1"

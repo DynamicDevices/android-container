@@ -1,0 +1,40 @@
+# Local KAS bring-up for imx95-frdm-evk (step 3 — after factory manifest is pushed)
+#
+# Usage (from meta-dynamicdevices, with factory build container / kas setup):
+#   export KAS_MACHINE=imx95-frdm-evk
+#   kas-container --ssh-agent --ssh-dir ${HOME}/.ssh \
+#     --runtime-args "-v ${HOME}/yocto:/var/cache" \
+#     build ../android-container/kas/imx95-frdm-evk-local.yml
+#
+# Requires lmp-manifest branch main-imx95-frdm-devel (dynamic-devices.xml) synced via repo.
+
+header:
+  version: 14
+  includes:
+    - ../../meta-dynamicdevices/kas/base.yml
+    - ../../meta-dynamicdevices/kas/bsp.yml
+    - ../../meta-dynamicdevices/kas/dynamicdevices.yml
+    - imx95-nxp-bsp.yml
+
+distro: lmp-dynamicdevices-headless-waydroid
+target: lmp-base-console-image
+machine: imx95-frdm-evk
+
+repos:
+  meta-dynamicdevices-bsp:
+    path: ../meta-dynamicdevices-bsp
+  meta-dynamicdevices-distro:
+    url: https://github.com/DynamicDevices/meta-dynamicdevices-distro.git
+    branch: main
+    path: meta-dynamicdevices-distro
+
+local_conf_header:
+  imx95-frdm-local: |
+    ACCEPT_FSL_EULA = "1"
+    DEV_MODE = "1"
+    LOCAL_DEVELOPMENT_BUILD = "1"
+    UBOOT_SIGN_ENABLE = "0"
+    TF_A_SIGN_ENABLE = "0"
+    OPTEE_TA_SIGN_ENABLE = "0"
+    MODSIGN = "0"
+    MODSIGN_ENABLE = "0"

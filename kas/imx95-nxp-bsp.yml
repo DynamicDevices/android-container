@@ -1,0 +1,12 @@
+# NXP i.MX BSP layers required for imx95-frdm-evk (not in meta-dynamicdevices kas/base.yml).
+header:
+  version: 14
+
+repos:
+  meta-imx:
+    url: https://github.com/nxp-imx/meta-imx.git
+    branch: scarthgap-6.6.52-2.2.1
+    path: build/layers/meta-imx
+    layers:
+      meta-imx-bsp:
+      meta-imx-sdk:

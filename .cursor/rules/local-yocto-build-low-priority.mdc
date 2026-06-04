@@ -1,0 +1,40 @@
+---
+description: Run local Yocto/kas/bitbake builds at lower CPU/IO priority than interactive desktop work
+alwaysApply: true
+---
+
+# Local Yocto builds — lower priority than desktop
+
+Local **kas-container**, **bitbake**, and related Yocto/LmP builds are long-running and CPU/IO heavy. They must **not** compete with interactive desktop work on the same machine.
+
+## Agent behavior
+
+When starting or suggesting local Yocto builds, **always** use lower scheduling priority:
+
+```bash
+nice -n 15 ionice -c2 -n7 kas-container ... build kas/imx95-frdm-evk-mfgtool.yml
+```
+
+Prefer `./scripts/kas-build-lowprio.sh` from `android-container/` when invoking kas from this repo.
+
+## Defaults
+
+| Tool | Setting | Meaning |
+|------|---------|---------|
+| `nice` | **10–19** (default **15**) | Lower CPU priority vs normal (0) |
+| `ionice` | **`-c 2 -n 7`** | Best-effort class, idle/lowest I/O priority |
+
+Override via env: `NICE_LEVEL`, `IONICE_CLASS`, `IONICE_LEVEL`.
+
+## Already running builds
+
+If bitbake was started without nice/ionice, lower priority in place:
+
+```bash
+renice -n 15 -p $(pgrep -f '[b]itbake')
+ionice -c2 -n7 -p $(pgrep -f '[b]itbake')
+```
+
+## Scope
+
+Applies to local developer machines only — **not** CI runners or dedicated build servers where full CPU/IO is intended.

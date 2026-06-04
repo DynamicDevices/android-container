@@ -1,0 +1,13 @@
+# Large flash artifacts and caches — exclude from Cursor indexing
+downloads/
+build/
+**/*.wic
+**/*.wic.gz
+**/*.wic.bz2
+**/*.imx
+**/*.tar.gz
+**/*.tgz
+**/*.zip
+
+tmp-lmp*/
+**/tmp-lmp*/

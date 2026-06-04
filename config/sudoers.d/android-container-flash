@@ -1,0 +1,28 @@
+# Passwordless uuu for Foundries i.MX95 flash (android-container).
+# Scope: user ajlennon only; uuu binaries used by scripts/flash-imx95-foundries.sh
+#
+# Install (once):
+#   ./scripts/install-flash-sudoers.sh [--link-bundled-uuu]
+# Or manually:
+#   sudo cp config/sudoers.d/android-container-flash /etc/sudoers.d/android-container-flash
+#   sudo chmod 0440 /etc/sudoers.d/android-container-flash
+#   sudo visudo -cf /etc/sudoers.d/android-container-flash
+
+Cmnd_Alias ANDROID_CONTAINER_UUU = \
+    /usr/bin/uuu, \
+    /usr/local/bin/imx95-uuu, \
+    /data_drive/esl/android-container/downloads/target-*/mfgtool-files-imx95-frdm-evk/uuu, \
+    /data_drive/esl/android-container/downloads/target-*/flash-bundle/uuu, \
+    /home/ajlennon/data_drive/esl/android-container/downloads/target-*/mfgtool-files-imx95-frdm-evk/uuu, \
+    /home/ajlennon/data_drive/esl/android-container/downloads/target-*/flash-bundle/uuu, \
+    /data_drive/esl/meta-dynamicdevices/build/tmp/deploy/images/*/mfgtool-files/uuu, \
+    /home/ajlennon/data_drive/esl/meta-dynamicdevices/build/tmp/deploy/images/*/mfgtool-files/uuu
+
+Cmnd_Alias ANDROID_CONTAINER_MM = \
+    /bin/systemctl stop ModemManager, /bin/systemctl start ModemManager, \
+    /usr/bin/systemctl stop ModemManager, /usr/bin/systemctl start ModemManager
+
+# sudo 1.9.15+ may reject user env (e.g. TERMINFO) unless SETENV is allowed for these commands.
+Defaults!ANDROID_CONTAINER_UUU env_keep += "TERM TERMINFO COLORTERM"
+ajlennon ALL=(root) NOPASSWD: SETENV: ANDROID_CONTAINER_UUU
+ajlennon ALL=(root) NOPASSWD: ANDROID_CONTAINER_MM

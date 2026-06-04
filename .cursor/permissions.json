@@ -1,0 +1,155 @@
+{
+  // Workspace terminal allowlist for FRDM / imx95 / Yocto lab work.
+  // Overrides IDE Command Allowlist when this key is set (per Cursor docs).
+  // Prefix matching on the full command string (case-sensitive).
+  // Concatenated with ~/.cursor/permissions.json if present.
+  "terminalAllowlist": [
+    // Shell / wrappers (agents often invoke scripts via bash -c or explicit paths)
+    "bash",
+    "sh",
+    "/bin/bash",
+    "/usr/bin/bash",
+    "env",
+    "command",
+    "exec",
+    "set",
+    "export",
+    "true",
+    "false",
+    ":",
+
+    // Navigation & esl sibling repos (BSP, manifest, lmp)
+    "cd",
+    "cd /home/ajlennon/data_drive/esl",
+    "cd ../meta-dynamicdevices",
+    "cd ../lmp-manifest",
+    "pwd",
+    "pushd",
+    "popd",
+
+    // Repo scripts (relative, absolute, and path-agnostic)
+    "./scripts/",
+    "scripts/",
+    "*android-container/scripts/",
+    "flash-imx95",
+    "kas-build-lowprio",
+    "capture-frdm-serial",
+    "setup-nxp-android-imx95",
+    "ser2net-check",
+
+    // Standard dev & text tools
+    "git",
+    "gh",
+    "grep",
+    "rg",
+    "sed",
+    "awk",
+    "cat",
+    "head",
+    "tail",
+    "less",
+    "more",
+    "tee",
+    "wc",
+    "sort",
+    "uniq",
+    "cut",
+    "tr",
+    "paste",
+    "comm",
+    "diff",
+    "cmp",
+    "patch",
+    "find",
+    "xargs",
+    "ls",
+    "stat",
+    "file",
+    "readlink",
+    "realpath",
+    "dirname",
+    "basename",
+    "test",
+    "[",
+    "echo",
+    "printf",
+    "date",
+    "sleep",
+    "nproc",
+    "uname",
+    "hostname",
+    "whoami",
+    "id",
+    "groups",
+    "df",
+    "du",
+    "numfmt",
+    "chmod",
+    "ln",
+    "touch",
+    "mkdir",
+    "cp",
+    "mv",
+    "rm",
+    "tar",
+    "gunzip",
+    "gzip",
+    "zcat",
+    "unzip",
+    "pv",
+
+    // Foundries / flash / serial lab
+    "fioctl",
+    "uuu",
+    "lsusb",
+    "nc",
+    "timeout",
+    "pgrep",
+    "curl",
+    "wget",
+    "jq",
+    "python3",
+
+    // Yocto / kas (low-priority local builds)
+    "nice",
+    "ionice",
+    "renice",
+    "kas-container",
+    "kas",
+    "bitbake",
+    "make",
+
+    // SSH / remote
+    "ssh",
+    "sshpass",
+
+    // Passwordless or askpass sudo only — not bare "sudo"
+    "sudo -n",
+    "sudo -A",
+    "env -u TERMINFO sudo -n",
+    "sudo -nl",
+
+    // systemctl (read-only checks; flash uses sudo -n systemctl)
+    "systemctl"
+  ],
+
+  // Optional: reduce MCP approval noise for lab + Git tooling
+  "mcpAllowlist": [
+    "user-ai-lab-testing:*",
+    "user-GitKraken:*"
+  ],
+
+  // Steers Auto-review classifier (no effect in pure Allowlist / Run Everything modes)
+  "autoRun": {
+    "allow_instructions": [
+      "Read-only and routine dev commands in android-container and under data_drive/esl (git, grep, fioctl, kas-container, bitbake, scripts/*.sh) are fine.",
+      "Use sudo -n or sudo -A only; never interactive bare sudo.",
+      "Hardware flash and serial capture should prefer ./scripts/flash-imx95-uuu-only.sh and ./scripts/capture-frdm-serial.sh."
+    ],
+    "block_instructions": [
+      "Reject bare sudo without -n or -A.",
+      "Reject destructive system-wide commands (rm -rf /, mkfs, dd to block devices, chmod -R /, apt remove on system packages) unless the user explicitly asked.",
+      "Reject writing under /etc without the user explicitly requesting host setup."
+    ]
+  }
+}
