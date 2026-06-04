@@ -3,6 +3,7 @@ downloads/
 build/
 tmp-lmp*/
 logs/
+*.log
 
 # Large images and archives
 *.wic
